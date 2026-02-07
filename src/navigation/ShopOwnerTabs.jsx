@@ -3,21 +3,23 @@ import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import HomeScreen from "../screens/HomeScreen";
-import OrdersScreen from "../screens/OrdersScreen";
-import ProfileScreen from "../screens/ProfileScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import ShopHomeScreen from "../screens/shop/ShopHomeScreen";
+import ShopOrdersScreen from "../screens/shop/ShopOrdersScreen";
+import ShopProfileScreen from "../screens/shop/ShopProfileScreen";
 import Navbar from "../components/Navbar";
 
 const Tab = createBottomTabNavigator();
 
-export default function UserTabs() {
+export default function ShopOwnerTabs() {
   return (
     <View style={styles.container}>
-      {/* Navbar stays on top of all tabs */}
-      <Navbar logo={require("../../assets/favicon.png")} />
+      {/* Navbar at the top */}
+      <Navbar
+        title="Shop Dashboard"
+        logo={require("../../assets/favicon.png")}
+      />
 
-      {/* Tabs take the rest of the screen */}
+      {/* Tabs below Navbar */}
       <View style={styles.tabsContainer}>
         <Tab.Navigator
           screenOptions={({ route }) => ({
@@ -26,35 +28,31 @@ export default function UserTabs() {
             tabBarInactiveTintColor: "#888",
             tabBarStyle: {
               height: 65,
-              backgroundColor: "#fff",
               paddingBottom: 5,
               elevation: 5,
+              backgroundColor: "#fff",
             },
             tabBarLabelStyle: { fontSize: 12, marginBottom: 5 },
-            tabBarIcon: ({ color }) => {
+            tabBarIcon: ({ color, size }) => {
               let iconName;
               switch (route.name) {
-                case "Home":
+                case "ShopHome":
                   iconName = "home";
                   break;
-                case "Orders":
+                case "ShopOrders":
                   iconName = "shopping-cart";
                   break;
-                case "Profile":
+                case "ShopProfile":
                   iconName = "person";
-                  break;
-                case "Settings":
-                  iconName = "settings";
                   break;
               }
               return <MaterialIcons name={iconName} size={28} color={color} />;
             },
           })}
         >
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Orders" component={OrdersScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
-          <Tab.Screen name="Settings" component={SettingsScreen} />
+          <Tab.Screen name="ShopHome" component={ShopHomeScreen} />
+          <Tab.Screen name="ShopOrders" component={ShopOrdersScreen} />
+          <Tab.Screen name="ShopProfile" component={ShopProfileScreen} />
         </Tab.Navigator>
       </View>
     </View>
@@ -62,6 +60,10 @@ export default function UserTabs() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  tabsContainer: { flex: 1 }, // important: make tabs fill remaining space below Navbar
+  container: {
+    flex: 1,
+  },
+  tabsContainer: {
+    flex: 1, // makes tabs fill remaining space below Navbar
+  },
 });

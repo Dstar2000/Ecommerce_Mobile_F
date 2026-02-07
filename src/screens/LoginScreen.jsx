@@ -1,122 +1,215 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
-  ImageBackground,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  Animated,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { login } from "../services/auth.service";
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
-    navigation.replace("UserTabs"); // navigate to bottom tabs
+  // Animated values for floating labels
+  const animatedValues = {
+    email: useRef(new Animated.Value(0)).current,
+    password: useRef(new Animated.Value(0)).current,
+  };
+
+  const handleChange = (key, value) => {
+    setForm({ ...form, [key]: value });
+    if (errors[key]) setErrors({ ...errors, [key]: null });
+  };
+
+  const handleFocus = (key) => {
+    Animated.timing(animatedValues[key], {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const handleBlur = (key) => {
+    if (!form[key]) {
+      Animated.timing(animatedValues[key], {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!form.email) newErrors.email = "Email is required";
+    else if (!/^\S+@\S+\.\S+$/.test(form.email))
+      newErrors.email = "Invalid email format";
+
+    if (!form.password) newErrors.password = "Password is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleLogin = async () => {
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+      const res = await login(form);
+      const { accessToken, user } = res.data.data;
+
+      if (!accessToken) {
+        Alert.alert("Login Failed", "Token missing from server");
+        return;
+      }
+
+      await AsyncStorage.setItem("accessToken", accessToken);
+      await AsyncStorage.setItem("userRole", user.role);
+
+      // Navigate based on role
+      if (user.role === "customer") {
+        navigation.replace("CustomerTabs");
+      } else if (user.role === "shopOwner") {
+        navigation.replace("ShopOwnerTabs");
+      } else {
+        Alert.alert("Login Failed", "Invalid user role");
+      }
+    } catch (err) {
+      console.log("LOGIN ERROR 👉", err.response?.data || err.message);
+      Alert.alert(
+        "Login Failed",
+        err.response?.data?.message || "Server error",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderInput = (key, label, secure = false, keyboard = "default") => {
+    const hasError = errors[key];
+    const labelStyle = {
+      position: "absolute",
+      left: 0,
+      top: animatedValues[key].interpolate({
+        inputRange: [0, 1],
+        outputRange: [14, -10],
+      }),
+      fontSize: animatedValues[key].interpolate({
+        inputRange: [0, 1],
+        outputRange: [16, 12],
+      }),
+      color: animatedValues[key].interpolate({
+        inputRange: [0, 1],
+        outputRange: ["#888", "#00bcd4"],
+      }),
+    };
+
+    return (
+      <View style={{ marginBottom: 25 }}>
+        <Animated.Text style={labelStyle}>
+          {label} <Text style={{ color: "red" }}>*</Text>
+        </Animated.Text>
+        <TextInput
+          style={styles.input}
+          value={form[key]}
+          onChangeText={(val) => handleChange(key, val)}
+          onFocus={() => handleFocus(key)}
+          onBlur={() => handleBlur(key)}
+          secureTextEntry={secure && !showPassword}
+          keyboardType={keyboard}
+        />
+        <View
+          style={[
+            styles.underline,
+            { backgroundColor: hasError ? "red" : "#00bcd4" },
+          ]}
+        />
+        {hasError && <Text style={styles.error}>{hasError}</Text>}
+      </View>
+    );
   };
 
   return (
-    <ImageBackground
-      source={{
-        uri: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-      }}
-      style={styles.background}
-      blurRadius={3}
-    >
-      <ScrollView contentContainerStyle={styles.overlay}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Login to continue</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>Login to continue</Text>
 
-        {/* Email */}
-        <View style={styles.inputContainer}>
-          <MaterialIcons name="email" size={24} color="#888" />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-            placeholderTextColor="#888"
-          />
-        </View>
+      {renderInput("email", "Email", false, "email-address")}
+      {renderInput("password", "Password", true)}
 
-        {/* Password */}
-        <View style={styles.inputContainer}>
-          <MaterialIcons name="lock" size={24} color="#888" />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-            placeholderTextColor="#888"
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <MaterialIcons
-              name={showPassword ? "visibility" : "visibility-off"}
-              size={24}
-              color="#888"
-            />
-          </TouchableOpacity>
-        </View>
+      <TouchableOpacity
+        style={styles.showPasswordBtn}
+        onPress={() => setShowPassword(!showPassword)}
+      >
+        <MaterialIcons
+          name={showPassword ? "visibility" : "visibility-off"}
+          size={24}
+          color="#888"
+        />
+        <Text style={{ marginLeft: 8 }}>{showPassword ? "Hide" : "Show"}</Text>
+      </TouchableOpacity>
 
-        {/* Login Button */}
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
           <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+        )}
+      </TouchableOpacity>
 
-        {/* Signup Link */}
-        <Text style={styles.signupText}>
-          Don't have an account?{" "}
-          <Text
-            style={styles.signupLink}
-            onPress={() => navigation.navigate("SignUp")}
-          >
-            Sign Up
-          </Text>
+      <Text style={styles.signupText}>
+        Don't have an account?{" "}
+        <Text
+          style={styles.signupLink}
+          onPress={() => navigation.navigate("SignUp")}
+        >
+          Sign Up
         </Text>
-      </ScrollView>
-    </ImageBackground>
+      </Text>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  background: { flex: 1 },
-  overlay: {
+  container: {
     flexGrow: 1,
-    justifyContent: "center",
     padding: 30,
     paddingTop: 80,
     paddingBottom: 40,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: "#f5f5f5",
   },
-  title: {
-    color: "#fff",
-    fontSize: 36,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  subtitle: {
-    color: "#ccc",
+  title: { fontSize: 36, fontWeight: "bold", color: "#333", marginBottom: 5 },
+  subtitle: { fontSize: 16, color: "#666", marginBottom: 40 },
+  input: {
+    height: 50,
     fontSize: 16,
-    textAlign: "center",
-    marginBottom: 40,
+    color: "#000",
+    paddingTop: 14,
+    paddingHorizontal: 0,
   },
-  inputContainer: {
+  underline: { height: 1.5, width: "100%", marginTop: 2 },
+  error: { color: "red", fontSize: 12, marginTop: 4 },
+  showPasswordBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    marginBottom: 20,
+    marginBottom: 25,
   },
-  input: { flex: 1, height: 50, marginLeft: 10, color: "#333" },
   button: {
     backgroundColor: "#00bcd4",
     paddingVertical: 15,
@@ -125,6 +218,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  signupText: { marginTop: 25, textAlign: "center", color: "#ccc" },
+  signupText: { marginTop: 25, textAlign: "center", color: "#555" },
   signupLink: { color: "#00bcd4", fontWeight: "bold" },
 });
