@@ -1,30 +1,34 @@
 {
   "expo": {
-    "name": "EcommerceApp",
-    "slug": "EcommerceApp",
-    "version": "1.0.0",
+    "name": "KK E-Commerce Hub",
+    "slug": "kk-ecommerce-hub",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+
+    "icon": "./assets/kk-logo.png",
+
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
+
     "android": {
+      "package": "com.dileep_chavan.kkecommercehub",
+      "label": "KK E-Commerce Hub",
+      "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-foreground.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.dileep_chavan.EcommerceApp"
+      "edgeToEdgeEnabled": true
     },
+
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/app-icon.png"
     },
+
     "extra": {
       "API_URL": "http://10.185.7.125:8000/api",
       "eas": {
