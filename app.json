@@ -6,27 +6,27 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
 
-    "icon": "./assets/app-icon.png",
+    "icon": "./assets/kk2.png",
 
     "splash": {
-      "image": "./assets/kk-logo.png",
+      "image": "./assets/kk2.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
 
     "android": {
-    "package": "com.dileep_chavan.kkecommercehub.new",
+    "package": "com.dileep_chavan.kkecommercehub.v2",
     "label": "KK E-Commerce Hub",
     "versionCode": 3,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app-icon.png",
+        "foregroundImage": "./assets/kk2.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
 
     "web": {
-      "favicon": "./assets/kk-logo.png"
+      "favicon": "./assets/kk2.png"
     },
 
     "extra": {
