@@ -15,7 +15,7 @@
     },
 
     "android": {
-      "package": "com.dileep_chavan.kkecommercehub",
+      "package": "com.dileep_chavan.kkecommercehub.v2",
       "label": "KK E-Commerce Hub",
       "versionCode": 3,
       "adaptiveIcon": {
