@@ -15,9 +15,9 @@
     },
 
     "android": {
-      "package": "com.dileep_chavan.kkecommercehub.v2",
-      "label": "KK E-Commerce Hub",
-      "versionCode": 3,
+    "package": "com.dileep_chavan.kkecommercehub.new",
+    "label": "KK E-Commerce Hub",
+    "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-foreground.png",
         "backgroundColor": "#ffffff"
