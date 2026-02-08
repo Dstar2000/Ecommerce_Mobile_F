@@ -9,7 +9,7 @@
     "icon": "./assets/kk-logo.png",
 
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/kk-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,14 +19,14 @@
     "label": "KK E-Commerce Hub",
     "versionCode": 3,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-foreground.png",
+        "foregroundImage": "./assets/kk-logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
 
     "web": {
-      "favicon": "./assets/app-icon.png"
+      "favicon": "./assets/kk-logo.png"
     },
 
     "extra": {
