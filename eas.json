@@ -3,18 +3,31 @@
     "version": ">= 16.32.0",
     "appVersionSource": "remote"
   },
+
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://10.185.7.125:8000/api"
+      }
     },
+
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://kkm-b.onrender.com/api"
+      }
     },
+
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://kkm-b.onrender.com/api"
+      }
     }
   },
+
   "submit": {
     "production": {}
   }
